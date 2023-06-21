@@ -223,7 +223,7 @@ export const TwitchPlayer: React.FC<TwitchPlayerProps> = (props) => {
   }
 
   return (
-    <div className="aspect-video justify-self-center max-w-full">
+    <div className=" max-w-full">
       <div
         id={id}
         style={{

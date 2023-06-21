@@ -9,26 +9,31 @@ import { Toggle } from "@/components/ui/Toggle";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import { TwitchPlayer } from "./TwitchPlayer";
+import { cn } from "@/lib/utils";
 
-type TwitchEmbedProps = {
-  channel: string;
-};
-const TwitchEmbed = ({ channel }: TwitchEmbedProps) => (
-  <iframe
-    src={`https://player.twitch.tv/?channel=${channel}&parent=localhost&muted=true`}
-    height="100%"
-    width="100%"
-    allowFullScreen
-  ></iframe>
-);
+const gridLayout = [
+  undefined,
+  "grid-cols-1	grid-rows-1",
+  "grid-cols-2	grid-rows-1",
+  "grid-cols-2 grid-rows-[3fr_2fr] [&>*:first-child]:col-span-2",
+  "grid-cols-2	grid-rows-2",
+  "grid-cols-6	grid-rows-2 [&>*]:col-span-2 [&>*:first-child]:col-span-3 [&>*:nth-child(2)]:col-span-3",
+  "grid-cols-3",
+  "grid-cols-3 grid-rows-[3fr_2fr_2fr] [&>*:first-child]:col-span-3",
+  "grid-cols-4",
+] as const;
 
 export const VideoGrid = () => {
   const [state, send] = useMachine(streamsMachine);
 
+  const streamsInView = state.context.streams.filter(
+    (stream) => stream.hasVideo
+  );
+
   return (
-    <div className="w-full grid grid-rows-[58px_1fr] h-screen gap-4 overflow-hidden content-center">
-      <div className="bg-slate-950 border-b-4">
-        <div className="container flex flex-row py-2">
+    <div className="w-full grid grid-rows-[auto_1fr] h-screen overflow-hidden content-center">
+      <div className="bg-slate-950 border-cyan-50 border-b-4">
+        <div className="container flex flex-row py-4">
           <div className="grow flex gap-4">
             {state.context.streams.map((stream) => (
               <div
@@ -78,17 +83,20 @@ export const VideoGrid = () => {
           </div>
         </div>
       </div>
-      <div className="bg-slate-800 place-self-stretch grid grid-flow-row-dense grid-cols-[repeat(auto-fit,_minmax(400px,_1fr))]">
-        {state.context.streams
-          .filter((stream) => stream.hasVideo)
-          .map((stream) => (
-            <TwitchPlayer
-              id={stream.id}
-              channel={stream.channel}
-              key={stream.id}
-              muted={!stream.hasAudio}
-            />
-          ))}
+      <div
+        className={cn(
+          "bg-slate-800 place-self-stretch grid gap-1",
+          gridLayout[streamsInView.length]
+        )}
+      >
+        {streamsInView.map((stream) => (
+          <TwitchPlayer
+            id={stream.id}
+            channel={stream.channel}
+            key={stream.id}
+            muted={!stream.hasAudio}
+          />
+        ))}
       </div>
     </div>
   );
