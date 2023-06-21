@@ -1,12 +1,11 @@
-import Nav from "@/components/Nav";
+import { VideoGrid } from "@/components/VideoGrid";
 
-export default function Home() {
+const Home = () => {
   return (
-    <>
-      <Nav />
-      <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        Hello
-      </main>
-    </>
+    <main>
+      <VideoGrid />
+    </main>
   );
-}
+};
+
+export default Home;

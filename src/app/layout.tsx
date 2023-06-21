@@ -16,9 +16,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={cn("min-h-screen pt-12 antialiased", inter.className)}>
+      <body className={cn("min-h-screen antialiased", inter.className)}>
         {children}
       </body>
+      {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+      {/* <Script
+        src="https://player.twitch.tv/js/embed/v1.js"
+        strategy="beforeInteractive"
+      /> */}
     </html>
   );
 }
