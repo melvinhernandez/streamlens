@@ -1,73 +1,83 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
- 
+
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
- 
+
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
- 
+
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
- 
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
- 
+
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
- 
+
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
- 
+
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
- 
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
- 
+
     --ring: 215 20.2% 65.1%;
- 
+
     --radius: 0.5rem;
   }
- 
+
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
- 
+    --background: 213.3 17.6% 20%;
+    --foreground: 220 13.4% 69.2%;
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
- 
+
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
- 
+
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
- 
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
- 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
- 
+
+    --primary: 261.8 80.3% 50.2%;
+    --primary-foreground: 0 0% 100%;
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
- 
+
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 85.7% 97.3%;
- 
+
     --ring: 217.2 32.6% 17.5%;
+
+    --info: 198 93.1% 60%;
+    --success: 157.8 64.1% 52%;
+    --success-foreground: 158 100% 10%;
+    --warning: 42.8 96.4% 56.1%;
+    --error: 0 90.5% 71%;
+
+    --base-300: 213.3 17.6% 10%;
+    --base-200: 212.7 18% 12%;
+    --base-foreground: 220 13.4% 69.2%;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
@@ -76,3 +86,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* DaisyUI 'dark' color theme */
+/* primary: hsl(261.8,80.3%,50.2%) */
+/* foreground: hsl(0,0%,100%) */
+/* secondary: hsl(316.1,70.2%,50%) */
+/* accent: hsl(175.1,70.3%,41%) */
+/* neutral: hsl(213.3,17.6%,20%) */
+/* neutral-focus: hsl(212,17.2%,17.1%) */
+/* neutral-foreground: hsl(220,13.4%,69.2%) */
+/* base-100: hsl(212.3,18.3%,13.9%) */
+/* base-200: hsl(212.7,18%,12%) */
+/* base-300: hsl(213.3,17.6%,10%) */
+/* base-content: hsl(220,13.4%,69.2%) */
+/* info: hsl(198,93.1%,60%) */
+/* success: hsl(157.8,64.1%,52%) */
+/* warning: hsl(42.8,96.4%,56.1%) */
+/* error: hsl(0,90.5%,71%) */

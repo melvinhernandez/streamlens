@@ -1,11 +1,11 @@
-import { VideoGrid } from "@/components/VideoGrid";
+import { VideoGrid } from '@/components/VideoGrid';
 
-const Home = () => {
+function Home() {
   return (
     <main>
       <VideoGrid />
     </main>
   );
-};
+}
 
 export default Home;

@@ -1,35 +1,48 @@
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-// import { HiOutlineSpeakerWave, HiOutlineSpeakerXMark } from "react-icons/hi2";
 import type { Stream } from '@/utils/streamsMachine';
 import { Button } from '@/components/ui/Button';
 import { Toggle } from '@/components/ui/Toggle';
+import { cn } from '@/lib/utils';
 
 interface StreamControl extends Omit<Stream, 'id'> {
-  onAudioToggle: (isSelected: boolean) => void;
   onVideoToggle: (isSelected: boolean) => void;
   onClick: () => void;
+  isInSingleView: boolean;
+  disableVideoToggle: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const StreamControl = ({
+const StreamControl = ({
   channel,
-  // hasAudio,
   hasVideo,
-  // onAudioToggle,
   onVideoToggle,
   onClick,
+  isInSingleView,
+  disableVideoToggle,
 }: StreamControl) => {
   return (
-    <div className="border border-white flex gap-1 px-4 items-center">
-      <Button variant="outline" onClick={onClick}>
+    <div
+      className={cn('border bg-base-200 rounded-md flex items-center', {
+        'bg-success': isInSingleView,
+      })}
+    >
+      <Button
+        variant={isInSingleView ? 'selected' : 'base'}
+        onClick={onClick}
+        className="border-transparent"
+      >
         {channel}
       </Button>
-      <Toggle size="sm" pressed={hasVideo} onPressedChange={onVideoToggle}>
-        {hasVideo ? <FiEye /> : <FiEyeOff />}
+      <Toggle
+        size="sm"
+        variant={isInSingleView ? 'selected' : 'custom'}
+        pressed={hasVideo}
+        onPressedChange={onVideoToggle}
+        disabled={disableVideoToggle}
+      >
+        {hasVideo || isInSingleView ? <FiEye /> : <FiEyeOff />}
       </Toggle>
-      {/* <Toggle size="sm" pressed={hasAudio} onPressedChange={onAudioToggle}>
-        {hasAudio ? <HiOutlineSpeakerWave /> : <HiOutlineSpeakerXMark />}
-      </Toggle> */}
     </div>
   );
 };
+
+export { StreamControl };

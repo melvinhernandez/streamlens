@@ -42,9 +42,9 @@ export const VideoGrid = () => {
         }}
       />
       <div className="w-full grid grid-rows-[auto_1fr] h-screen overflow-hidden content-center">
-        <div className="bg-slate-950 border-cyan-50 border-b-4">
+        <div className="bg-background border-cyan-50 border-b-4">
           <div className="container flex flex-row py-4">
-            <ScrollArea className="grow w-[800px] bg-violet-500">
+            <ScrollArea className="grow w-[800px] bg-background">
               <div className="flex gap-4 items-center pb-4">
                 {state.context.streams.map(stream => (
                   <StreamControl
@@ -52,13 +52,10 @@ export const VideoGrid = () => {
                     channel={stream.channel}
                     hasAudio={stream.hasAudio}
                     hasVideo={stream.hasVideo}
-                    onAudioToggle={isSelected => {
-                      send({
-                        type: 'TOGGLE_MUTE',
-                        streamId: stream.id,
-                        mute: isSelected,
-                      });
-                    }}
+                    disableVideoToggle={state.context.singleViewStream !== null}
+                    isInSingleView={
+                      state.context.singleViewStream?.id === stream.id
+                    }
                     onVideoToggle={isSelected => {
                       send({
                         type: 'TOGGLE_SHOW',

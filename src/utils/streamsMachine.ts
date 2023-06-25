@@ -217,7 +217,7 @@ export const streamsMachine = createMachine(
         }
       },
       restoreLocalStorage: assign(() => {
-        const existingContext = window.localStorage.getItem('context');
+        const existingContext = window?.localStorage.getItem('context');
 
         if (existingContext) {
           console.log('existing', existingContext);
