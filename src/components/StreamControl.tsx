@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Toggle } from '@/components/ui/Toggle';
 import { cn } from '@/lib/utils';
 
-interface StreamControl extends Omit<Stream, 'id'> {
+interface StreamControlProps extends Omit<Stream, 'id'> {
   onVideoToggle: (isSelected: boolean) => void;
   onClick: () => void;
   isInSingleView: boolean;
@@ -18,7 +18,7 @@ const StreamControl = ({
   onClick,
   isInSingleView,
   disableVideoToggle,
-}: StreamControl) => {
+}: StreamControlProps) => {
   return (
     <div
       className={cn('border bg-base-200 rounded-md flex items-center', {

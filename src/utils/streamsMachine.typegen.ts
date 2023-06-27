@@ -3,6 +3,7 @@
 export interface Typegen0 {
   '@@xstate/typegen': true;
   internalEvents: {
+    '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
   };
   invokeSrcNameMap: {};
@@ -15,19 +16,18 @@ export interface Typegen0 {
   eventsCausingActions: {
     addStream: 'ADD';
     deleteStream: 'DELETE';
-    exitSingleView: 'TOGGLE_SHOW';
-    muteStream: 'TOGGLE_MUTE';
-    restoreLocalStorage: 'xstate.init';
+    restoreStoredContext: 'xstate.init';
+    saveToLocalStorage: 'ADD' | 'DELETE' | 'SELECT' | 'TOGGLE_SHOW';
     selectStream: 'SELECT';
     toggleHasVideo: 'TOGGLE_SHOW';
-    unselectStream: 'SELECT';
-    updateLocalStorage: 'ADD' | 'SCRIPT_LOADED' | 'TOGGLE_SHOW';
   };
   eventsCausingDelays: {};
   eventsCausingGuards: {
-    hasMultipleStreams: 'DELETE';
-    hasStreams: 'SCRIPT_LOADED';
-    isStreamInSingleView: 'SELECT' | 'TOGGLE_SHOW';
+    isChannelNotInStreams: 'ADD';
+    isStreamsEmpty: '';
+    isStreamsNotEmpty: 'SCRIPT_LOADED';
+    shouldShowMultiView: '';
+    shouldShowSingleView: '';
   };
   eventsCausingServices: {};
   matchesStates:

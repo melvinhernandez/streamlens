@@ -3,13 +3,12 @@
 import React from 'react';
 import { useMachine } from '@xstate/react';
 import { streamsMachine } from '@/utils/streamsMachine';
-import { SearchInput } from './SearchInput';
 import { TwitchPlayer } from './TwitchPlayer';
 import { cn } from '@/lib/utils';
 import Script from 'next/script';
-import { StreamControl } from './StreamControl';
-import { ScrollArea } from './ui/ScrollArea';
 import { Skeleton } from './ui/Skeleton';
+import { StreamsNav } from './StreamsNav';
+import { SideMenu } from './SideMenu';
 
 const gridLayout = [
   undefined,
@@ -44,38 +43,28 @@ export const VideoGrid = () => {
       <div className="w-full grid grid-rows-[auto_1fr] h-screen overflow-hidden content-center">
         <div className="bg-background border-cyan-50 border-b-4">
           <div className="container flex flex-row py-4">
-            <ScrollArea className="grow w-[800px] bg-background">
-              <div className="flex gap-4 items-center pb-4">
-                {state.context.streams.map(stream => (
-                  <StreamControl
-                    key={stream.id}
-                    channel={stream.channel}
-                    hasAudio={stream.hasAudio}
-                    hasVideo={stream.hasVideo}
-                    disableVideoToggle={state.context.singleViewStream !== null}
-                    isInSingleView={
-                      state.context.singleViewStream?.id === stream.id
-                    }
-                    onVideoToggle={isSelected => {
-                      send({
-                        type: 'TOGGLE_SHOW',
-                        streamId: stream.id,
-                        show: isSelected,
-                      });
-                    }}
-                    onClick={() => {
-                      send({
-                        type: 'SELECT',
-                        streamId: stream.id,
-                      });
-                    }}
-                  />
-                ))}
-              </div>
-            </ScrollArea>
-            <div className="grow-0">
-              <SearchInput
-                onSubmit={channel => send({ type: 'ADD', channel })}
+            <StreamsNav
+              streams={state.context.streams}
+              singleViewStream={state.context.singleViewStream}
+              onVideoToggle={(streamId, isSelected) => {
+                send({
+                  type: 'TOGGLE_SHOW',
+                  streamId: streamId,
+                  show: isSelected,
+                });
+              }}
+              onStreamClick={streamId => {
+                send({
+                  type: 'SELECT',
+                  streamId: streamId,
+                });
+              }}
+            />
+            <div className="grow-0 pl-2">
+              <SideMenu
+                onSearchSubmit={channel => send({ type: 'ADD', channel })}
+                onStreamDelete={streamId => send({ type: 'DELETE', streamId })}
+                streams={state.context.streams}
               />
             </div>
           </div>
@@ -92,7 +81,6 @@ export const VideoGrid = () => {
                 key={state.context.singleViewStream.id}
                 id={state.context.singleViewStream.id}
                 channel={state.context.singleViewStream.channel}
-                muted={!state.context.singleViewStream.hasAudio}
               />
             )}
           {state.matches('viewing.multi') &&
@@ -101,7 +89,6 @@ export const VideoGrid = () => {
                 key={stream.id}
                 id={stream.id}
                 channel={stream.channel}
-                muted={!stream.hasAudio}
               />
             ))}
           {(state.matches('loading') || state.matches('idle')) && (

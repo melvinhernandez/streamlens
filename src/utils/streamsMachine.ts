@@ -3,7 +3,6 @@ import { assign, createMachine } from 'xstate';
 export type Stream = {
   id: string;
   channel: string;
-  hasAudio: boolean;
   hasVideo: boolean;
 };
 
@@ -30,15 +29,12 @@ type Events =
       streamId: string;
     }
   | {
-      type: 'TOGGLE_MUTE';
-      streamId: string;
-      mute: boolean;
-    }
-  | {
       type: 'TOGGLE_SHOW';
       streamId: string;
       show: boolean;
     };
+
+const STORAGE_KEY = 'streamlens_context_v1';
 
 const INITIAL_CONTEXT: Context = {
   streams: [],
@@ -59,12 +55,12 @@ export const streamsMachine = createMachine(
     context: INITIAL_CONTEXT,
     states: {
       loading: {
-        entry: ['restoreLocalStorage'],
+        entry: ['restoreStoredContext'],
         on: {
           SCRIPT_LOADED: [
             {
               target: 'viewing',
-              cond: 'hasStreams',
+              cond: 'isStreamsNotEmpty',
             },
             {
               target: 'idle',
@@ -76,78 +72,29 @@ export const streamsMachine = createMachine(
         on: {
           ADD: {
             target: 'viewing',
-            actions: 'addStream',
+            actions: ['addStream', 'saveToLocalStorage'],
           },
         },
       },
       viewing: {
-        description:
-          'This is a _state description_.\n\n[📚 Learn more in the docs](https://stately.ai/docs)',
         initial: 'multi',
-        entry: ['updateLocalStorage'],
+        always: [{ target: 'idle', cond: 'isStreamsEmpty' }],
         states: {
           multi: {
-            on: {
-              SELECT: {
-                target: 'single',
-                actions: ['selectStream'],
-              },
-            },
+            always: [{ target: 'single', cond: 'shouldShowSingleView' }],
           },
           single: {
-            on: {
-              SELECT: [
-                {
-                  target: 'multi',
-                  actions: ['unselectStream'],
-                  cond: 'isStreamInSingleView',
-                  description:
-                    'New stream selected is in SingleView so it becomes "unselected"',
-                },
-                {
-                  target: 'single',
-                  actions: ['selectStream'],
-                  description: 'New stream selected is not the SingleView',
-                  internal: false,
-                },
-              ],
-            },
+            always: [{ target: 'multi', cond: 'shouldShowMultiView' }],
           },
         },
         on: {
-          DELETE: [
-            {
-              cond: 'hasMultipleStreams',
-              actions: ['deleteStream'],
-            },
-            {
-              target: 'idle',
-              actions: ['deleteStream'],
-            },
-          ],
           ADD: {
-            target: 'viewing',
-            actions: ['addStream'],
-            internal: false,
+            actions: ['addStream', 'saveToLocalStorage'],
+            cond: 'isChannelNotInStreams',
           },
-          TOGGLE_SHOW: [
-            {
-              actions: ['exitSingleView'],
-              description:
-                'State is in SingleView && streamId is not currently playing in SingleView',
-              target: '.multi',
-              cond: 'isStreamInSingleView',
-            },
-            {
-              actions: 'toggleHasVideo',
-              target: 'viewing',
-              internal: false,
-            },
-          ],
-          TOGGLE_MUTE: {
-            actions: ['muteStream'],
-            description: 'Mute button click or native player mute click',
-          },
+          SELECT: { actions: ['selectStream', 'saveToLocalStorage'] },
+          DELETE: { actions: ['deleteStream', 'saveToLocalStorage'] },
+          TOGGLE_SHOW: { actions: ['toggleHasVideo', 'saveToLocalStorage'] },
         },
       },
     },
@@ -156,105 +103,71 @@ export const streamsMachine = createMachine(
   },
   {
     actions: {
-      addStream: assign((context, { channel }) => {
-        const id = context.currentId;
+      addStream: assign((ctx, { channel }) => {
+        const id = ctx.currentId;
 
         return {
           streams: [
-            ...context.streams,
+            ...ctx.streams,
             {
               id: id.toString(),
               channel,
               hasVideo: true,
-              hasAudio: true,
             },
           ],
           currentId: id + 1,
         };
       }),
-      deleteStream: assign({
-        streams: (context, event) =>
-          context.streams.filter(stream => stream.id !== event.streamId),
-      }),
-      selectStream: assign({
-        singleViewStream: (context, event) => {
-          const selectedStream = context.streams.find(
-            stream => stream.id === event.streamId,
-          );
+      deleteStream: assign((ctx, { streamId }) => {
+        const isStreamInSingleView = ctx.singleViewStream?.id === streamId;
 
-          return selectedStream || null;
-        },
+        return {
+          streams: ctx.streams.filter(stream => stream.id !== streamId),
+          singleViewStream: isStreamInSingleView ? null : ctx.singleViewStream,
+        };
       }),
-      unselectStream: assign({
-        singleViewStream: null,
-      }),
-      exitSingleView: assign({
-        streams: (context, event) =>
-          context.streams.map(stream => {
-            if (stream.id === event.streamId) {
-              return { ...stream, hasVideo: event.show };
-            }
+      selectStream: assign((ctx, { streamId }) => {
+        // Unselect stream if it is currently selected
+        if (ctx.singleViewStream?.id === streamId) {
+          return { singleViewStream: null };
+        }
 
-            return stream;
-          }),
-        singleViewStream: null,
+        return {
+          singleViewStream:
+            ctx.streams.find(stream => stream.id === streamId) || null,
+        };
       }),
       toggleHasVideo: assign({
-        streams: (context, event) =>
-          context.streams.map(stream => {
-            if (stream.id === event.streamId) {
-              return { ...stream, hasVideo: event.show };
+        streams: (ctx, { streamId, show }) =>
+          ctx.streams.map(stream => {
+            if (stream.id === streamId) {
+              return { ...stream, hasVideo: show };
             }
 
             return stream;
           }),
       }),
-      updateLocalStorage: (context, event) => {
-        console.log('localStorage', event);
-        if (window.localStorage) {
-          console.log('updating localStorage', context);
-          window.localStorage.setItem('context', JSON.stringify(context));
-        }
+      saveToLocalStorage: ctx => {
+        window?.localStorage.setItem(STORAGE_KEY, JSON.stringify(ctx));
       },
-      restoreLocalStorage: assign(() => {
-        const existingContext = window?.localStorage.getItem('context');
+      restoreStoredContext: assign(() => {
+        const existingContext = window?.localStorage.getItem(STORAGE_KEY);
 
         if (existingContext) {
-          console.log('existing', existingContext);
-
           return JSON.parse(existingContext);
         }
 
         return INITIAL_CONTEXT;
       }),
-      muteStream: assign({
-        streams: (context, event) =>
-          context.streams.map(stream => {
-            if (stream.id === event.streamId) {
-              return { ...stream, hasAudio: event.mute };
-            }
-
-            return stream;
-          }),
-      }),
     },
     guards: {
-      hasStreams: context => context.streams.length >= 1,
-      hasMultipleStreams: context => context.streams.length > 1,
-      isStreamInSingleView: (context, event) => {
-        console.log('isStreamInSingleView');
-        if (event.type === 'SELECT') {
-          return context.singleViewStream?.id === event.streamId;
-        }
-        if (event.type === 'TOGGLE_SHOW') {
-          const isPlayingInSingleView =
-            context.singleViewStream?.id === event.streamId;
-
-          return isPlayingInSingleView && !event.show;
-        }
-
-        return false;
-      },
+      isChannelNotInStreams: (ctx, { channel }) =>
+        ctx.streams.every(stream => stream.channel !== channel),
+      isStreamsEmpty: ctx => ctx.streams.length === 0,
+      isStreamsNotEmpty: ctx => ctx.streams.length >= 1,
+      shouldShowSingleView: ctx => ctx.singleViewStream !== null,
+      shouldShowMultiView: ctx =>
+        ctx.singleViewStream === null && ctx.streams.length >= 1,
     },
   },
 );

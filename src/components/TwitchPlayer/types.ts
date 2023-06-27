@@ -1,15 +1,13 @@
+/**
+ * Types copied from: https://github.com/moonstar-x/react-twitch-embed/blob/c198a9f4f08eb58fcb68e06fb59c520cc51fc5db/src/types.ts
+ */
+
 export interface OnPlayData {
   sessionId: string;
 }
 
 export interface OnSeekData {
   position: number;
-}
-
-export interface OnAuthenticateData {
-  displayName: string;
-  id: string;
-  profileImageURL: string;
 }
 
 export interface PlayerQuality {
@@ -78,7 +76,7 @@ export interface PlayerState {
   duration: number;
   ended: boolean;
   muted: boolean;
-  playback: "Idle" | "Ready" | "Buffering" | "Playing" | "Ended";
+  playback: 'Idle' | 'Ready' | 'Buffering' | 'Playing' | 'Ended';
   qualitiesAvailable: string[];
   quality: string;
   stats: {
@@ -237,7 +235,7 @@ export interface TwitchPlayerInstance extends EventTarget {
   addEventListener: (
     event: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    callback: (...args: any[]) => void
+    callback: (...args: any[]) => void,
   ) => void;
 }
 
@@ -259,7 +257,7 @@ export interface TwitchPlayerConstructorOptions {
 export interface TwitchPlayerConstructor {
   new (
     id: string,
-    options: TwitchPlayerConstructorOptions
+    options: TwitchPlayerConstructorOptions,
   ): TwitchPlayerInstance;
 
   /**
@@ -325,54 +323,10 @@ export interface TwitchEmbedInstance extends TwitchPlayerInstance {
   getPlayer: () => TwitchPlayerInstance;
 }
 
-export interface TwitchEmbedConstructorOptions {
-  allowfullscreen?: boolean;
-  autoplay?: boolean;
-  channel?: string;
-  collection?: string;
-  controls?: boolean;
-  height?: string | number;
-  layout?: "video-with-chat" | "video";
-  muted?: boolean;
-  parent?: string[] | null;
-  theme?: "light" | "dark";
-  time?: string;
-  video?: string;
-  width?: string | number;
-}
-
-export interface TwitchEmbedConstructor {
-  new (id: string, options: TwitchEmbedConstructorOptions): TwitchEmbedInstance;
-
-  /**
-   * UNDOCUMENTED. The embed instance has been authenticated with the user's stored credentials.
-   * This callback receives an object with displayName, id and profileImageURL properties.
-   */
-  AUTHENTICATE: string;
-
-  /**
-   * The video started playing. This callback receives an object with a sessionId property.
-   */
-  VIDEO_PLAY: string;
-
-  /**
-   * UNDOCUMENTED. The video player has been paused.
-   */
-  VIDEO_PAUSE: string;
-
-  /**
-   * The video player is ready for API commands.
-   */
-  VIDEO_READY: string;
-}
-
-export interface TwitchWindow {
-  Embed?: TwitchEmbedConstructor;
-  Player?: TwitchPlayerConstructor;
-}
-
 declare global {
   interface Window {
-    Twitch?: TwitchWindow;
+    Twitch?: {
+      Player: TwitchPlayerConstructor;
+    };
   }
 }
