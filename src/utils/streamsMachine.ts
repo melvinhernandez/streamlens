@@ -148,13 +148,17 @@ export const streamsMachine = createMachine(
           }),
       }),
       saveToLocalStorage: ctx => {
-        window?.localStorage.setItem(STORAGE_KEY, JSON.stringify(ctx));
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ctx));
+        }
       },
       restoreStoredContext: assign(() => {
-        const existingContext = window?.localStorage.getItem(STORAGE_KEY);
+        if (typeof window !== 'undefined') {
+          const existingContext = window.localStorage.getItem(STORAGE_KEY);
 
-        if (existingContext) {
-          return JSON.parse(existingContext);
+          if (existingContext) {
+            return JSON.parse(existingContext);
+          }
         }
 
         return INITIAL_CONTEXT;
