@@ -38,15 +38,13 @@ export const TwitchPlayer: React.FC<TwitchPlayerProps> = props => {
   }, [channel, createPlayer]);
 
   return (
-    <div className="max-w-full">
-      <div
-        id={id}
-        style={{
-          height: '100%',
-          width: 'auto',
-        }}
-        {...restOfProps}
-      />
-    </div>
+    <div
+      id={id}
+      style={{
+        height: '100%',
+        width: 'auto',
+      }}
+      {...restOfProps}
+    />
   );
 };

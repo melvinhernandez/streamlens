@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { useMachine } from '@xstate/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { streamsMachine } from '@/utils/streamsMachine';
 import { TwitchPlayer } from './TwitchPlayer';
 import { cn } from '@/lib/utils';
@@ -26,9 +27,9 @@ const gridLayout = [
 export const VideoGrid = () => {
   const [state, send] = useMachine(streamsMachine);
 
-  const streamsInView = state.context.streams.filter(stream => stream.hasVideo);
-
-  const gridClass = gridLayout[streamsInView.length] || '';
+  const streamsInView = state.context.singleViewStream
+    ? [state.context.singleViewStream]
+    : state.context.streams.filter(stream => stream.hasVideo);
 
   return (
     <>
@@ -36,13 +37,11 @@ export const VideoGrid = () => {
         src="https://player.twitch.tv/js/embed/v1.js"
         onReady={() => {
           send({ type: 'SCRIPT_LOADED' });
-
-          return;
         }}
       />
       <div className="w-full grid grid-rows-[auto_1fr] h-screen overflow-hidden content-center">
-        <div className="bg-background border-cyan-50 border-b-4">
-          <div className="container flex flex-row py-4">
+        <div className="bg-background border-cyan-50 border-b-4 relative z-10">
+          <div className="container flex flex-row py-4 ">
             <StreamsNav
               streams={state.context.streams}
               singleViewStream={state.context.singleViewStream}
@@ -69,32 +68,49 @@ export const VideoGrid = () => {
             </div>
           </div>
         </div>
-        <div
-          className={cn('bg-slate-800 place-self-stretch grid gap-1', {
-            'grid-cols-1	grid-rows-1': state.matches('viewing.single'),
-            [gridClass]: state.matches('viewing.multi'),
-          })}
-        >
-          {state.matches('viewing.single') &&
-            state.context.singleViewStream && (
-              <TwitchPlayer
-                key={state.context.singleViewStream.id}
-                id={state.context.singleViewStream.id}
-                channel={state.context.singleViewStream.channel}
-              />
+        {state.matches('viewing') && (
+          <motion.div
+            layoutRoot
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={cn(
+              'bg-slate-800 place-self-stretch grid gap-1',
+              gridLayout[streamsInView.length],
             )}
-          {state.matches('viewing.multi') &&
-            streamsInView.map(stream => (
-              <TwitchPlayer
-                key={stream.id}
-                id={stream.id}
-                channel={stream.channel}
-              />
-            ))}
+          >
+            {/* With `popLayout`, elements move to the their new layout immediately  */}
+            <AnimatePresence mode="popLayout">
+              {streamsInView.map(stream => (
+                <motion.div
+                  layout="preserve-aspect"
+                  layoutId={`stream-layout-${stream.id}`}
+                  className="max-w-full overflow-hidden"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  key={stream.id}
+                >
+                  <TwitchPlayer id={stream.id} channel={stream.channel} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        )}
+        <AnimatePresence>
           {(state.matches('loading') || state.matches('idle')) && (
-            <Skeleton className="w-full min-h-full" />
+            <motion.div
+              key="skeleton"
+              className="place-self-stretch max-w-full"
+              initial={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              animate={{ opacity: 1 }}
+            >
+              <Skeleton className="w-full min-h-full" />
+            </motion.div>
           )}
-        </div>
+        </AnimatePresence>
       </div>
     </>
   );

@@ -6,7 +6,9 @@ export interface Typegen0 {
     '': { type: '' };
     'xstate.init': { type: 'xstate.init' };
   };
-  invokeSrcNameMap: {};
+  invokeSrcNameMap: {
+    notifyOnTwitchScriptLoad: 'done.invoke.streams.loading:invocation[0]';
+  };
   missingImplementations: {
     actions: never;
     delays: never;
@@ -29,7 +31,9 @@ export interface Typegen0 {
     shouldShowMultiView: '';
     shouldShowSingleView: '';
   };
-  eventsCausingServices: {};
+  eventsCausingServices: {
+    notifyOnTwitchScriptLoad: 'xstate.init';
+  };
   matchesStates:
     | 'idle'
     | 'loading'

@@ -12,7 +12,7 @@ type Context = {
   currentId: number;
 };
 
-type Events =
+type StreamsEvent =
   | {
       type: 'SCRIPT_LOADED';
     }
@@ -48,7 +48,7 @@ export const streamsMachine = createMachine(
     tsTypes: {} as import('./streamsMachine.typegen').Typegen0,
     schema: {
       context: {} as Context,
-      events: {} as Events,
+      events: {} as StreamsEvent,
     },
     id: 'streams',
     initial: 'loading',
@@ -66,6 +66,9 @@ export const streamsMachine = createMachine(
               target: 'idle',
             },
           ],
+        },
+        invoke: {
+          src: 'notifyOnTwitchScriptLoad',
         },
       },
       idle: {
@@ -163,6 +166,19 @@ export const streamsMachine = createMachine(
 
         return INITIAL_CONTEXT;
       }),
+    },
+    services: {
+      notifyOnTwitchScriptLoad: () => send => {
+        const id = setInterval(() => {
+          if (typeof window !== 'undefined' && window.Twitch?.Player) {
+            send('SCRIPT_LOADED');
+          }
+        }, 500);
+
+        return () => {
+          clearInterval(id);
+        };
+      },
     },
     guards: {
       isChannelNotInStreams: (ctx, { channel }) =>
