@@ -18,7 +18,7 @@ export interface Typegen0 {
   eventsCausingActions: {
     addStream: 'ADD';
     deleteStream: 'DELETE';
-    restoreStoredContext: 'xstate.init';
+    restoreStoredContext: 'SCRIPT_LOADED';
     saveToLocalStorage: 'ADD' | 'DELETE' | 'SELECT' | 'TOGGLE_SHOW';
     selectStream: 'SELECT';
     toggleHasVideo: 'TOGGLE_SHOW';
@@ -27,7 +27,7 @@ export interface Typegen0 {
   eventsCausingGuards: {
     isChannelNotInStreams: 'ADD';
     isStreamsEmpty: '';
-    isStreamsNotEmpty: 'SCRIPT_LOADED';
+    isStreamsNotEmpty: '';
     shouldShowMultiView: '';
     shouldShowSingleView: '';
   };

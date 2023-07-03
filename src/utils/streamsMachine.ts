@@ -55,27 +55,22 @@ export const streamsMachine = createMachine(
     context: INITIAL_CONTEXT,
     states: {
       loading: {
-        entry: ['restoreStoredContext'],
         on: {
-          SCRIPT_LOADED: [
-            {
-              target: 'viewing',
-              cond: 'isStreamsNotEmpty',
-            },
-            {
-              target: 'idle',
-            },
-          ],
+          SCRIPT_LOADED: {
+            target: 'idle',
+            actions: ['restoreStoredContext'],
+          },
         },
         invoke: {
           src: 'notifyOnTwitchScriptLoad',
         },
       },
       idle: {
+        always: [{ target: 'viewing', cond: 'isStreamsNotEmpty' }],
         on: {
           ADD: {
-            target: 'viewing',
             actions: ['addStream', 'saveToLocalStorage'],
+            cond: 'isChannelNotInStreams',
           },
         },
       },

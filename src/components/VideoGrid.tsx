@@ -40,8 +40,8 @@ export const VideoGrid = () => {
         }}
       />
       <div className="w-full grid grid-rows-[auto_1fr] h-screen overflow-hidden content-center">
-        <div className="bg-background border-cyan-50 border-b-4 relative z-10">
-          <div className="container flex flex-row py-4 ">
+        <div className="bg-background border-base-300 border-b-4 relative z-10">
+          <div className="container flex flex-row py-2">
             <StreamsNav
               streams={state.context.streams}
               singleViewStream={state.context.singleViewStream}
@@ -86,7 +86,6 @@ export const VideoGrid = () => {
                 <motion.div
                   layout="preserve-aspect"
                   layoutId={`stream-layout-${stream.id}`}
-                  className="max-w-full overflow-hidden"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}

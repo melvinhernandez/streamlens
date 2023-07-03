@@ -1,3 +1,5 @@
+'use client';
+
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import type { Stream } from '@/utils/streamsMachine';
 import { Button } from '@/components/ui/Button';

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { HamburgerMenuIcon } from '@radix-ui/react-icons';
 import type { Stream } from '@/utils/streamsMachine';
 import {
@@ -26,11 +26,9 @@ export const SideMenu = ({
   onSearchSubmit,
   onStreamDelete,
 }: SideMenuProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <Sheet open={isOpen} onOpenChange={open => setIsOpen(open)}>
-      <SheetTrigger>
+    <Sheet>
+      <SheetTrigger asChild>
         <Button variant="outline" size="icon">
           <HamburgerMenuIcon />
         </Button>
